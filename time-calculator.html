@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>时间计算器 — 前端工具集</title>
+    <style>
+        :root{
+            --ios-blue: #007AFF;
+            --ios-blue-light: rgba(0,122,255,0.08);
+            --ios-blue-hover: rgba(0,122,255,0.15);
+            --ios-gray-1: #8E8E93;
+            --ios-gray-2: #AEAEB2;
+            --ios-gray-3: #C7C7CC;
+            --ios-gray-4: #D1D1D6;
+            --ios-gray-5: #E5E5EA;
+            --ios-gray-6: #F2F2F7;
+            --ios-white: #FFFFFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --shadow-light: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-medium: 0 4px 16px rgba(0,0,0,0.08);
+            --shadow-heavy: 0 8px 32px rgba(0,0,0,0.12);
+            --border-radius-small: 8px;
+            --border-radius-medium: 12px;
+            --border-radius-large: 16px;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *{box-sizing:border-box;margin:0;padding:0;font-family:var(--font-family);} 
+        body{background:linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);min-height:100vh;color:#000;display:flex;} 
+        .sidebar{width:280px;background:var(--ios-white);height:100vh;position:fixed;left:0;top:0;box-shadow:var(--shadow-medium);display:flex;flex-direction:column;border-right:1px solid var(--ios-gray-5);} 
+        .sidebar-header{padding:28px 24px;text-align:center;border-bottom:1px solid var(--ios-gray-5);background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;position:relative;overflow:hidden;} 
+        .sidebar-header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);} 
+        .sidebar-title{font-size:22px;font-weight:700;position:relative;z-index:1;text-shadow:0 1px 2px rgba(0,0,0,0.1);} 
+        .sidebar-subtitle{font-size:13px;margin-top:6px;opacity:0.9;position:relative;z-index:1;} 
+        .sidebar-nav{flex:1;padding:16px 0;} 
+        .menu-list{list-style:none;} 
+        .menu-item{margin:4px 12px;border-radius:var(--border-radius-medium);overflow:hidden;} 
+        .menu-link{display:flex;align-items:center;padding:14px 20px;text-decoration:none;color:var(--ios-gray-1);transition:var(--transition);border-radius:var(--border-radius-medium);} 
+        .menu-link:hover{background:var(--ios-blue-light);color:var(--ios-blue);transform:translateX(2px);} 
+        .menu-item.active .menu-link{background:linear-gradient(135deg, var(--ios-blue) 0%, #5856D6 100%);color:white;box-shadow:var(--shadow-light);} 
+        .menu-item.active .menu-link:hover{background:linear-gradient(135deg, #5856D6 0%, var(--ios-blue) 100%);} 
+        .menu-icon{font-size:18px;margin-right:12px;display:flex;align-items:center;justify-content:center;width:24px;height:24px;} 
+        .menu-text{font-size:15px;font-weight:500;} 
+        .main-content{flex:1;margin-left:280px;padding:40px 32px} 
+        .tool-panel{background:var(--ios-white);border-radius:var(--border-radius-large);padding:32px;box-shadow:var(--shadow-medium);max-width:1000px;border:1px solid var(--ios-gray-5);} 
+        .panel-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px} 
+        .panel-title h1{font-size:28px;font-weight:700;color:#1D1D1F;} 
+        .panel-subtitle{font-size:15px;color:var(--ios-gray-1);margin-top:4px;} 
+        .input-container{display:flex;flex-direction:column;gap:8px;margin-bottom:20px} 
+        .input-label{font-size:16px;font-weight:600;color:#1D1D1F;} 
+        input[type="date"], input[type="number"]{background:var(--ios-gray-6);border:1px solid var(--ios-gray-4);border-radius:var(--border-radius-medium);padding:16px;font-size:16px;transition:var(--transition);border:2px solid transparent;} 
+        input[type="date"]:focus, input[type="number"]:focus{border-color:var(--ios-blue);outline:none;} 
+        .select-container{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap} 
+        .select-group{display:flex;flex-direction:column;gap:6px} 
+        .select-label{font-size:16px;font-weight:600;color:#1D1D1F;} 
+        select{background:var(--ios-gray-6);border:1px solid var(--ios-gray-4);border-radius:var(--border-radius-medium);padding:12px;font-size:15px;transition:var(--transition);border:2px solid transparent;} 
+        select:focus{border-color:var(--ios-blue);outline:none;} 
+        .action-row{display:flex;gap:16px;margin:24px 0;flex-wrap:wrap} 
+        .btn{padding:12px 20px;border-radius:var(--border-radius-medium);border:none;cursor:pointer;font-weight:600;font-size:15px;transition:var(--transition);box-shadow:var(--shadow-light);} 
+        .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-medium);} 
+        .btn-primary{background:linear-gradient(135deg, var(--ios-blue) 0%, #5856D6 100%);color:#fff;} 
+        .btn-outline{background:var(--ios-white);border:2px solid var(--ios-gray-4);color:#000;} 
+        .btn-outline:hover{border-color:var(--ios-blue);color:var(--ios-blue);} 
+        .result-container{background:linear-gradient(135deg, var(--ios-gray-6) 0%, var(--ios-white) 100%);padding:20px;border-radius:var(--border-radius-large);margin-top:20px;border:1px solid var(--ios-gray-4);} 
+        .result-label{font-size:16px;font-weight:600;margin-bottom:12px;color:#1D1D1F;} 
+        .result-text{background:var(--ios-white);padding:16px;border-radius:var(--border-radius-medium);font-family:Monaco,monospace;font-size:16px;word-break:break-all;border:1px solid var(--ios-gray-4);box-shadow:inset 0 1px 3px rgba(0,0,0,0.05);} 
+        .tab-container{display:flex;margin-bottom:20px;border-bottom:2px solid var(--ios-gray-4);border-radius:var(--border-radius-medium) var(--border-radius-medium) 0 0;overflow:hidden;} 
+        .tab-btn{padding:12px 20px;border:none;background:var(--ios-gray-5);cursor:pointer;font-size:15px;font-weight:500;transition:var(--transition);border-right:1px solid var(--ios-gray-4);} 
+        .tab-btn:last-child{border-right:none;} 
+        .tab-btn.active{background:linear-gradient(135deg, var(--ios-blue) 0%, #5856D6 100%);color:white;font-weight:600;} 
+        .tab-btn:hover:not(.active){background:var(--ios-blue-light);color:var(--ios-blue);} 
+        .tab-content{display:none} 
+        .tab-content.active{display:block} 
+        footer{margin-top:32px;color:var(--ios-gray-1);font-size:13px;text-align:center;padding:16px;border-radius:var(--border-radius-medium);background:var(--ios-gray-6);} 
+        @media (max-width:768px){
+            .sidebar{transform:translateX(-100%);position:fixed;z-index:1000;transition:var(--transition);}
+            .main-content{margin-left:0;padding:20px}
+            .tool-panel{max-width:100%;}
+            .panel-title h1{font-size:24px;}
+            .action-row{flex-direction:column;}
+            .btn{width:100%;}
+            .tab-container{flex-direction:column;}
+            .tab-btn{border-right:none;border-bottom:1px solid var(--ios-gray-4);}
+            .tab-btn:last-child{border-bottom:none;}
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">前端工具集</div>
+            <div class="sidebar-subtitle">Web 开发工具</div>
+        </div>
+        <nav class="sidebar-nav">
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <a href="index.html" class="menu-link">
+                        <span class="menu-icon">🏠</span>
+                        <span class="menu-text">首页</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="json-parser.html" class="menu-link">
+                        <span class="menu-icon">📄</span>
+                        <span class="menu-text">JSON 解析</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="camel-case-converter.html" class="menu-link">
+                        <span class="menu-icon">🔄</span>
+                        <span class="menu-text">命名转换</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a href="time-calculator.html" class="menu-link">
+                        <span class="menu-icon">⏰</span>
+                        <span class="menu-text">时间计算</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="random-data-generator.html" class="menu-link">
+                        <span class="menu-icon">🎲</span>
+                        <span class="menu-text">随机数据</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="tool-panel" role="region" aria-label="时间计算器">
+            <div class="panel-title">
+                <div>
+                    <h1>时间计算器</h1>
+                    <div class="panel-subtitle">日期时间差计算和时间加减操作</div>
+                </div>
+                <a href="index.html" class="btn btn-outline">返回首页</a>
+            </div>
+
+            <div class="tab-container">
+                <button class="tab-btn active" data-tab="diff">日期差计算</button>
+                <button class="tab-btn" data-tab="add">日期加减</button>
+            </div>
+
+            <div id="diffTab" class="tab-content active">
+                <div class="input-container">
+                    <label class="input-label" for="startDate">开始时间：</label>
+                    <input type="datetime-local" id="startDate" />
+                </div>
+                <div class="input-container">
+                    <label class="input-label" for="endDate">结束时间：</label>
+                    <input type="datetime-local" id="endDate" />
+                </div>
+                <div class="action-row">
+                    <button id="calcDiffBtn" class="btn btn-primary">计算差值</button>
+                </div>
+            </div>
+
+            <div id="addTab" class="tab-content">
+                <div class="input-container">
+                    <label class="input-label" for="baseDate">基准时间：</label>
+                    <input type="datetime-local" id="baseDate" />
+                </div>
+                <div class="select-container">
+                    <div class="select-group">
+                        <label class="select-label" for="operation">操作：</label>
+                        <select id="operation">
+                            <option value="add">加</option>
+                            <option value="subtract">减</option>
+                        </select>
+                    </div>
+                    <div class="select-group">
+                        <label class="select-label" for="unit">单位：</label>
+                        <select id="unit">
+                            <option value="seconds">秒</option>
+                            <option value="minutes">分钟</option>
+                            <option value="hours">小时</option>
+                            <option value="days">天</option>
+                            <option value="weeks">周</option>
+                            <option value="months">月</option>
+                            <option value="years">年</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-container">
+                    <label class="input-label" for="amount">数量：</label>
+                    <input type="number" id="amount" min="1" value="1" />
+                </div>
+                <div class="action-row">
+                    <button id="calcAddBtn" class="btn btn-primary">计算结果</button>
+                </div>
+            </div>
+
+            <div class="result-container">
+                <div class="result-label">计算结果：</div>
+                <div id="resultText" class="result-text">-</div>
+            </div>
+
+            <footer>
+                <small>支持日期时间差计算和时间加减操作（秒、分钟、小时、天、周、月、年）</small>
+            </footer>
+        </div>
+    </main>
+
+    <script>
+        const tabs = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const resultText = document.getElementById('resultText');
+
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab + 'Tab').classList.add('active');
+                resultText.textContent = '-';
+            });
+        });
+
+        // Date difference calculation
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+        const calcDiffBtn = document.getElementById('calcDiffBtn');
+
+        function calcDateDiff() {
+            const start = new Date(startDate.value);
+            const end = new Date(endDate.value);
+            if (!startDate.value || !endDate.value) {
+                resultText.textContent = '请选择开始和结束时间';
+                return;
+            }
+            const diffMs = Math.abs(end - start);
+            const diffSeconds = Math.floor(diffMs / 1000);
+            const diffMinutes = Math.floor(diffSeconds / 60);
+            const diffHours = Math.floor(diffMinutes / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            const days = diffDays;
+            const hours = diffHours % 24;
+            const minutes = diffMinutes % 60;
+            const seconds = diffSeconds % 60;
+            
+            let result = '';
+            if (days > 0) result += `${days} 天 `;
+            if (hours > 0) result += `${hours} 小时 `;
+            if (minutes > 0) result += `${minutes} 分钟 `;
+            if (seconds > 0) result += `${seconds} 秒`;
+            resultText.textContent = result.trim() || '0 秒';
+        }
+
+        calcDiffBtn.addEventListener('click', calcDateDiff);
+
+        // Date addition/subtraction
+        const baseDate = document.getElementById('baseDate');
+        const operation = document.getElementById('operation');
+        const unit = document.getElementById('unit');
+        const amount = document.getElementById('amount');
+        const calcAddBtn = document.getElementById('calcAddBtn');
+
+        function calcDateAdd() {
+            const base = new Date(baseDate.value);
+            if (!baseDate.value) {
+                resultText.textContent = '请选择基准时间';
+                return;
+            }
+            const amt = parseInt(amount.value) || 1;
+            const op = operation.value === 'add' ? 1 : -1;
+            let resultDate = new Date(base);
+
+            switch(unit.value) {
+                case 'seconds':
+                    resultDate.setSeconds(resultDate.getSeconds() + amt * op);
+                    break;
+                case 'minutes':
+                    resultDate.setMinutes(resultDate.getMinutes() + amt * op);
+                    break;
+                case 'hours':
+                    resultDate.setHours(resultDate.getHours() + amt * op);
+                    break;
+                case 'days':
+                    resultDate.setDate(resultDate.getDate() + amt * op);
+                    break;
+                case 'weeks':
+                    resultDate.setDate(resultDate.getDate() + amt * 7 * op);
+                    break;
+                case 'months':
+                    resultDate.setMonth(resultDate.getMonth() + amt * op);
+                    break;
+                case 'years':
+                    resultDate.setFullYear(resultDate.getFullYear() + amt * op);
+                    break;
+            }
+
+            resultText.textContent = resultDate.toLocaleString('zh-CN');
+        }
+
+        calcAddBtn.addEventListener('click', calcDateAdd);
+
+        // Set default dates
+        const now = new Date();
+        const nowStr = now.toISOString().slice(0, 16); // For datetime-local
+        startDate.value = nowStr;
+        endDate.value = nowStr;
+        baseDate.value = nowStr;
+    </script>
+</body>
+</html>

@@ -3,280 +3,147 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>随机信息生成器 — 前端工具集</title>
+    <title>前端工具集</title>
     <style>
         :root{
             --ios-blue: #007AFF;
             --ios-blue-light: rgba(0,122,255,0.08);
+            --ios-blue-hover: rgba(0,122,255,0.15);
             --ios-gray-1: #8E8E93;
-            --ios-gray-4: #E5E5EA;
-            --ios-gray-5: #F2F2F7;
-            --ios-gray-6: #FFFFFF;
+            --ios-gray-2: #AEAEB2;
+            --ios-gray-3: #C7C7CC;
+            --ios-gray-4: #D1D1D6;
+            --ios-gray-5: #E5E5EA;
+            --ios-gray-6: #F2F2F7;
+            --ios-white: #FFFFFF;
             --ios-green: #34C759;
-            --shadow: 0 6px 20px rgba(0,0,0,0.06);
+            --ios-red: #FF3B30;
+            --shadow-light: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-medium: 0 4px 16px rgba(0,0,0,0.08);
+            --shadow-heavy: 0 8px 32px rgba(0,0,0,0.12);
+            --border-radius-small: 8px;
+            --border-radius-medium: 12px;
+            --border-radius-large: 16px;
             --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         *{box-sizing:border-box;margin:0;padding:0;font-family:var(--font-family);} 
-        body{background:var(--ios-gray-5);min-height:100vh;color:#000;display:flex;} 
-        .sidebar{width:260px;background:var(--ios-gray-6);height:100vh;position:fixed;left:0;top:0;box-shadow:var(--shadow);display:flex;flex-direction:column;} 
-        .sidebar-header{padding:24px;text-align:center;border-bottom:1px solid var(--ios-gray-4);background:linear-gradient(135deg,#f5f7fa 0%,#e4e8ed 100%);} 
-        .sidebar-title{font-size:20px;font-weight:700;background:linear-gradient(135deg,#007AFF,#5856D6);-webkit-background-clip:text;-webkit-text-fill-color:transparent} 
-        .sidebar-subtitle{font-size:13px;color:var(--ios-gray-1);margin-top:4px} 
-        .main-content{flex:1;margin-left:260px;padding:32px} 
-        .tool-panel{background:#fff;border-radius:14px;padding:24px;box-shadow:var(--shadow);max-width:920px} 
-        .panel-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px} 
-        .panel-title h1{font-size:20px} 
-        .panel-subtitle{font-size:13px;color:var(--ios-gray-1)} 
-        .action-row{display:flex;gap:12px;margin:18px 0;flex-wrap:wrap} 
-        .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:600} 
-        .btn-primary{background:var(--ios-blue);color:#fff} 
-        .btn-outline{background:transparent;border:1px solid var(--ios-gray-4;color:#000;padding:9px 12px;border-radius:10px} 
-        .result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:10px} 
-        .result-card{background:var(--ios-gray-5);padding:14px;border-radius:12px;display:flex;flex-direction:column;gap:8px} 
-        .result-label{font-size:13px;color:var(--ios-gray-1);display:flex;justify-content:space-between;align-items:center} 
-        .result-value{background:var(--ios-gray-6);padding:10px;border-radius:8px;font-family:Menlo,Monaco,monospace;word-break:break-all;border-left:4px solid var(--ios-blue);min-height:42px;display:flex;align-items:center;justify-content:space-between} 
-        .small-btn{padding:6px 10px;border-radius:8px;border:none;background:var(--ios-blue);color:#fff;cursor:pointer;font-weight:600} 
-        .copy-notification{position:fixed;top:20px;right:20px;background:var(--ios-green);color:#fff;padding:10px 16px;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,0.12);opacity:0;transform:translateY(-10px);transition:all .28s ease} 
-        .copy-notification.show{opacity:1;transform:translateY(0)} 
-        footer{margin-top:22px;color:var(--ios-gray-1);font-size:13px;text-align:center} 
+        body{background:linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);min-height:100vh;color:#000;display:flex;} 
+        .sidebar{width:280px;background:var(--ios-white);height:100vh;position:fixed;left:0;top:0;box-shadow:var(--shadow-medium);display:flex;flex-direction:column;border-right:1px solid var(--ios-gray-5);} 
+        .sidebar-header{padding:28px 24px;text-align:center;border-bottom:1px solid var(--ios-gray-5);background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;position:relative;overflow:hidden;} 
+        .sidebar-header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);} 
+        .sidebar-title{font-size:22px;font-weight:700;position:relative;z-index:1;text-shadow:0 1px 2px rgba(0,0,0,0.1);} 
+        .sidebar-subtitle{font-size:13px;margin-top:6px;opacity:0.9;position:relative;z-index:1;} 
+        .sidebar-nav{flex:1;padding:16px 0;} 
+        .menu-list{list-style:none;} 
+        .menu-item{margin:4px 12px;border-radius:var(--border-radius-medium);overflow:hidden;} 
+        .menu-link{display:flex;align-items:center;padding:14px 20px;text-decoration:none;color:var(--ios-gray-1);transition:var(--transition);border-radius:var(--border-radius-medium);} 
+        .menu-link:hover{background:var(--ios-blue-light);color:var(--ios-blue);transform:translateX(2px);} 
+        .menu-item.active .menu-link{background:linear-gradient(135deg, var(--ios-blue) 0%, #5856D6 100%);color:white;box-shadow:var(--shadow-light);} 
+        .menu-item.active .menu-link:hover{background:linear-gradient(135deg, #5856D6 0%, var(--ios-blue) 100%);} 
+        .menu-icon{font-size:18px;margin-right:12px;display:flex;align-items:center;justify-content:center;width:24px;height:24px;} 
+        .menu-text{font-size:15px;font-weight:500;} 
+        .main-content{flex:1;margin-left:280px;padding:40px 32px} 
+        .tool-panel{background:var(--ios-white);border-radius:var(--border-radius-large);padding:32px;box-shadow:var(--shadow-medium);max-width:1000px;border:1px solid var(--ios-gray-5);} 
+        .panel-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px} 
+        .panel-title h1{font-size:28px;font-weight:700;color:#1D1D1F;} 
+        .panel-subtitle{font-size:15px;color:var(--ios-gray-1);margin-top:4px;} 
+        .tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-top:24px} 
+        .tool-card{background:linear-gradient(135deg, var(--ios-white) 0%, var(--ios-gray-6) 100%);padding:28px;border-radius:var(--border-radius-large);text-align:center;cursor:pointer;transition:var(--transition);border:1px solid var(--ios-gray-4);position:relative;overflow:hidden;} 
+        .tool-card::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg, rgba(0,122,255,0.02) 0%, rgba(0,122,255,0.05) 100%);opacity:0;transition:var(--transition);} 
+        .tool-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-heavy);} 
+        .tool-card:hover::before{opacity:1;} 
+        .tool-icon{font-size:36px;margin-bottom:12px;display:block;} 
+        .tool-name{font-size:18px;font-weight:600;color:#1D1D1F;margin-bottom:6px;} 
+        .tool-desc{font-size:13px;color:var(--ios-gray-1);line-height:1.4;} 
+        footer{margin-top:32px;color:var(--ios-gray-1);font-size:13px;text-align:center;padding:16px;border-radius:var(--border-radius-medium);background:var(--ios-gray-6);} 
         @media (max-width:768px){
-            .sidebar{transform:translateX(-100%);position:fixed;z-index:1000}
-            .main-content{margin-left:0;padding:16px}
+            .sidebar{transform:translateX(-100%);position:fixed;z-index:1000;transition:var(--transition);}
+            .main-content{margin-left:0;padding:20px}
+            .tool-grid{grid-template-columns:1fr;}
+            .panel-title h1{font-size:24px;}
         }
     </style>
 </head>
 <body>
-    <aside class="sidebar" aria-hidden="true">
+    <aside class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-title">前端工具集</div>
-            <div class="sidebar-subtitle">随机信息生成器</div>
+            <div class="sidebar-subtitle">Web 开发工具</div>
         </div>
+        <nav class="sidebar-nav">
+            <ul class="menu-list">
+                <li class="menu-item active">
+                    <a href="index.html" class="menu-link">
+                        <span class="menu-icon">🏠</span>
+                        <span class="menu-text">首页</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="json-parser.html" class="menu-link">
+                        <span class="menu-icon">📄</span>
+                        <span class="menu-text">JSON 解析</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="camel-case-converter.html" class="menu-link">
+                        <span class="menu-icon">🔄</span>
+                        <span class="menu-text">命名转换</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="time-calculator.html" class="menu-link">
+                        <span class="menu-icon">⏰</span>
+                        <span class="menu-text">时间计算</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="random-data-generator.html" class="menu-link">
+                        <span class="menu-icon">🎲</span>
+                        <span class="menu-text">随机数据</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </aside>
 
     <main class="main-content">
-        <div class="tool-panel" role="region" aria-label="随机信息生成器">
+        <div class="tool-panel" role="region" aria-label="工具选择">
             <div class="panel-title">
                 <div>
-                    <h1>随机信息生成器</h1>
-                    <div class="panel-subtitle">点击“生成”即可一次获得：随机中文名 / 手机号 / 身份证号（合规校验位）</div>
+                    <h1>前端工具集</h1>
+                    <div class="panel-subtitle">选择您需要的工具</div>
                 </div>
             </div>
 
-            <div class="action-row">
-                <button id="generateBtn" class="btn btn-primary">生成</button>
-                <button id="generateMaleBtn" class="btn" style="background:#f4f6f8;">生成（男）</button>
-                <button id="generateFemaleBtn" class="btn" style="background:#f4f6f8;">生成（女）</button>
-                <button id="regenerateBtn" class="btn" style="background:transparent;border:1px solid var(--ios-gray-4;">清空并重新生成</button>
-            </div>
-
-            <div class="result-grid">
-                <div class="result-card">
-                    <div class="result-label">
-                        <span>中文名</span>
-                        <button class="small-btn" data-copy-target="nameValue">复制</button>
-                    </div>
-                    <div id="nameValue" class="result-value">-</div>
-                </div>
-
-                <div class="result-card">
-                    <div class="result-label">
-                        <span>手机号码</span>
-                        <button class="small-btn" data-copy-target="phoneValue">复制</button>
-                    </div>
-                    <div id="phoneValue" class="result-value">-</div>
-                </div>
-
-                <div class="result-card">
-                    <div class="result-label">
-                        <span>身份证号（18位）</span>
-                        <button class="small-btn" data-copy-target="idValue">复制</button>
-                    </div>
-                    <div id="idValue" class="result-value">-</div>
-                </div>
+            <div class="tool-grid">
+                <a href="json-parser.html" class="tool-card">
+                    <div class="tool-icon">📄</div>
+                    <div class="tool-name">JSON 在线解析</div>
+                    <div class="tool-desc">格式化、验证 JSON 数据</div>
+                </a>
+                <a href="camel-case-converter.html" class="tool-card">
+                    <div class="tool-icon">🔄</div>
+                    <div class="tool-name">驼峰名转换</div>
+                    <div class="tool-desc">显示所有命名格式转换</div>
+                </a>
+                <a href="time-calculator.html" class="tool-card">
+                    <div class="tool-icon">⏰</div>
+                    <div class="tool-name">时间计算器</div>
+                    <div class="tool-desc">日期时间差计算和加减</div>
+                </a>
+                <a href="random-data-generator.html" class="tool-card">
+                    <div class="tool-icon">🎲</div>
+                    <div class="tool-name">随机生成数据</div>
+                    <div class="tool-desc">生成随机信息</div>
+                </a>
             </div>
 
             <footer>
-                <small>注：身份证号采用常见地区码示例并计算校验位，仅用于测试/演示，请勿用于真实身份冒用。</small>
+                <small>前端开发辅助工具集</small>
             </footer>
         </div>
     </main>
-
-    <div id="copyNotification" class="copy-notification" aria-live="polite">已复制到剪贴板</div>
-
-    <script>
-        // 通用：复制与提示
-        function showCopyNotification(text){
-            const el = document.getElementById('copyNotification');
-            el.textContent = text || '已复制到剪贴板';
-            el.classList.add('show');
-            setTimeout(()=>el.classList.remove('show'),1800);
-        }
-
-        function copyToClipboard(text){
-            if(!text) return;
-            if(navigator.clipboard && window.isSecureContext){
-                navigator.clipboard.writeText(text).then(()=>showCopyNotification()).catch(()=>fallbackCopy(text));
-            } else {
-                fallbackCopy(text);
-            }
-        }
-        function fallbackCopy(text){
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            ta.style.position = 'fixed';
-            ta.style.left = '-9999px';
-            document.body.appendChild(ta);
-            ta.select();
-            try{
-                document.execCommand('copy');
-                showCopyNotification();
-            }catch(e){
-                console.error('复制失败', e);
-                alert('复制失败，请手动复制');
-            }
-            document.body.removeChild(ta);
-        }
-
-        // 生成器：中文名
-        const surnames = "赵钱孙李周吴郑王冯陈褚卫蒋沈韩杨朱秦尤许何吕施张孔曹严华金魏陶姜".split('');
-        const nameChars = "嘉浩明华伟俊婷娟静敏磊洋勇军斌峰玲梅雪丽芳".split('');
-
-        function randomChineseName(gender){ // gender: 'male'|'female'|undefined
-            const surname = surnames[Math.floor(Math.random()*surnames.length)];
-            const givenLen = Math.random() < 0.6 ? 1 : 2; // 1 or 2 chars
-            let given = '';
-            for(let i=0;i<givenLen;i++){
-                // try to bias male/female characters slightly by list membership (simple heuristic)
-                const pool = nameChars;
-                given += pool[Math.floor(Math.random()*pool.length)];
-            }
-            return surname + given;
-        }
-
-        // 手机号生成（常见号段）
-        const phonePrefixes = [
-            '130','131','132','133','134','135','136','137','138','139',
-            '150','151','152','153','155','156','157','158','159',
-            '166','170','171','172','173','174','175','176','177','178','179',
-            '180','181','182','183','184','185','186','187','188','189',
-            '198','199'
-        ];
-        function randomPhone(){
-            const p = phonePrefixes[Math.floor(Math.random()*phonePrefixes.length)];
-            let rest = '';
-            for(let i=0;i<8;i++) rest += Math.floor(Math.random()*10);
-            return p + rest;
-        }
-
-        // 身份证号生成（18位，含校验位）
-        // 使用部分常见地区码作为示例
-        const addressCodes = [
-            '110000','110100','120000','310000','440100','440300','330100','320100','420100','510100'
-        ];
-
-        // 计算校验位： ISO 7064:1983, MOD 11-2
-        function calcIDChecksum17(id17){
-            // id17: string of 17 digits
-            const weights = [7,9,10,5,8,4,2,1,6,3,7,9,10,5,8,4,2];
-            const checkMap = ['1','0','X','9','8','7','6','5','4','3','2'];
-            let sum = 0;
-            for(let i=0;i<17;i++){
-                sum += parseInt(id17.charAt(i),10) * weights[i];
-            }
-            const mod = sum % 11;
-            return checkMap[mod];
-        }
-
-        function randomBirthdate(minYear=1950, maxYear=new Date().getFullYear()){
-            const year = getRandomInt(minYear, maxYear);
-            const month = getRandomInt(1,12);
-            const day = getRandomInt(1, daysInMonth(year, month));
-            return {year, month, day};
-        }
-
-        function daysInMonth(y,m){
-            return new Date(y, m, 0).getDate();
-        }
-
-        function pad(num, len=2){
-            return num.toString().padStart(len,'0');
-        }
-
-        function getRandomInt(min, max){
-            return Math.floor(Math.random()*(max - min + 1)) + min;
-        }
-
-        function randomIdCard(gender){ // gender: 'male'|'female'|undefined
-            const addr = addressCodes[Math.floor(Math.random()*addressCodes.length)];
-            // birth between 1950 and 2005 by default for plausible ages; allow recent years too
-            const birth = randomBirthdate(1950, 2005);
-            const birthStr = String(birth.year) + pad(birth.month) + pad(birth.day);
-            // sequence code: 3 digits, last digit odd->male, even->female
-            let seq;
-            if(gender === 'male') {
-                // choose odd
-                let n = getRandomInt(0, 999);
-                if(n % 2 === 0) n = (n + 1) % 1000;
-                seq = pad(n,3);
-            } else if(gender === 'female'){
-                let n = getRandomInt(0, 999);
-                if(n % 2 === 1) n = (n + 1) % 1000;
-                seq = pad(n,3);
-            } else {
-                seq = pad(getRandomInt(0,999),3);
-            }
-            const id17 = addr + birthStr + seq;
-            const checksum = calcIDChecksum17(id17);
-            return id17 + checksum;
-        }
-
-        // DOM wiring
-        const nameEl = document.getElementById('nameValue');
-        const phoneEl = document.getElementById('phoneValue');
-        const idEl = document.getElementById('idValue');
-        const generateBtn = document.getElementById('generateBtn');
-        const generateMaleBtn = document.getElementById('generateMaleBtn');
-        const generateFemaleBtn = document.getElementById('generateFemaleBtn');
-        const regenerateBtn = document.getElementById('regenerateBtn');
-
-        function generateAll(gender){
-            const name = randomChineseName(gender);
-            const phone = randomPhone();
-            const id = randomIdCard(gender);
-            nameEl.textContent = name;
-            phoneEl.textContent = phone;
-            idEl.textContent = id;
-        }
-
-        generateBtn.addEventListener('click', ()=>generateAll());
-        generateMaleBtn.addEventListener('click', ()=>generateAll('male'));
-        generateFemaleBtn.addEventListener('click', ()=>generateAll('female'));
-        regenerateBtn.addEventListener('click', ()=>{
-            nameEl.textContent = '-';
-            phoneEl.textContent = '-';
-            idEl.textContent = '-';
-            // then generate again
-            setTimeout(()=>generateAll(), 120);
-        });
-
-        // copy buttons
-        document.querySelectorAll('[data-copy-target]').forEach(btn=>{
-            btn.addEventListener('click', function(){
-                const targetId = this.getAttribute('data-copy-target');
-                const el = document.getElementById(targetId);
-                const text = el.textContent;
-                if(text && text !== '-'){ 
-                    copyToClipboard(text);
-                } else {
-                    showCopyNotification('暂无可复制内容');
-                }
-            });
-        });
-
-        // 初始化：不自动生成，等待用户点击（按需可改）
-        // generateAll();
-
-    </script>
 </body>
 </html>

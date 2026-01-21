@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>驼峰名转换 — 前端工具集</title>
+    <style>
+        :root{
+            --ios-blue: #007AFF;
+            --ios-blue-light: rgba(0,122,255,0.08);
+            --ios-blue-hover: rgba(0,122,255,0.15);
+            --ios-gray-1: #8E8E93;
+            --ios-gray-2: #AEAEB2;
+            --ios-gray-3: #C7C7CC;
+            --ios-gray-4: #D1D1D6;
+            --ios-gray-5: #E5E5EA;
+            --ios-gray-6: #F2F2F7;
+            --ios-white: #FFFFFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --shadow-light: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-medium: 0 4px 16px rgba(0,0,0,0.08);
+            --shadow-heavy: 0 8px 32px rgba(0,0,0,0.12);
+            --border-radius-small: 8px;
+            --border-radius-medium: 12px;
+            --border-radius-large: 16px;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *{box-sizing:border-box;margin:0;padding:0;font-family:var(--font-family);} 
+        body{background:linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);min-height:100vh;color:#000;display:flex;} 
+        .sidebar{width:280px;background:var(--ios-white);height:100vh;position:fixed;left:0;top:0;box-shadow:var(--shadow-medium);display:flex;flex-direction:column;border-right:1px solid var(--ios-gray-5);} 
+        .sidebar-header{padding:28px 24px;text-align:center;border-bottom:1px solid var(--ios-gray-5);background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;position:relative;overflow:hidden;} 
+        .sidebar-header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);} 
+        .sidebar-title{font-size:22px;font-weight:700;position:relative;z-index:1;text-shadow:0 1px 2px rgba(0,0,0,0.1);} 
+        .sidebar-subtitle{font-size:13px;margin-top:6px;opacity:0.9;position:relative;z-index:1;} 
+        .sidebar-nav{flex:1;padding:16px 0;} 
+        .menu-list{list-style:none;} 
+        .menu-item{margin:4px 12px;border-radius:var(--border-radius-medium);overflow:hidden;} 
+        .menu-link{display:flex;align-items:center;padding:14px 20px;text-decoration:none;color:var(--ios-gray-1);transition:var(--transition);border-radius:var(--border-radius-medium);} 
+        .menu-link:hover{background:var(--ios-blue-light);color:var(--ios-blue);transform:translateX(2px);} 
+        .menu-item.active .menu-link{background:linear-gradient(135deg, var(--ios-blue) 0%, #5856D6 100%);color:white;box-shadow:var(--shadow-light);} 
+        .menu-item.active .menu-link:hover{background:linear-gradient(135deg, #5856D6 0%, var(--ios-blue) 100%);} 
+        .menu-icon{font-size:18px;margin-right:12px;display:flex;align-items:center;justify-content:center;width:24px;height:24px;} 
+        .menu-text{font-size:15px;font-weight:500;} 
+        .main-content{flex:1;margin-left:280px;padding:40px 32px} 
+        .tool-panel{background:var(--ios-white);border-radius:var(--border-radius-large);padding:32px;box-shadow:var(--shadow-medium);max-width:1000px;border:1px solid var(--ios-gray-5);} 
+        .panel-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px} 
+        .panel-title h1{font-size:28px;font-weight:700;color:#1D1D1F;} 
+        .panel-subtitle{font-size:15px;color:var(--ios-gray-1);margin-top:4px;} 
+        .input-container{display:flex;flex-direction:column;gap:8px;margin-bottom:20px} 
+        .input-label{font-size:16px;font-weight:600;color:#1D1D1F;} 
+        input[type="text"]{background:var(--ios-gray-6);border:1px solid var(--ios-gray-4);border-radius:var(--border-radius-medium);padding:16px;font-size:16px;transition:var(--transition);border:2px solid transparent;} 
+        input[type="text"]:focus{border-color:var(--ios-blue);outline:none;} 
+        .select-container{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap} 
+        .select-group{display:flex;flex-direction:column;gap:6px} 
+        .select-label{font-size:16px;font-weight:600;color:#1D1D1F;} 
+        select{background:var(--ios-gray-6);border:1px solid var(--ios-gray-4);border-radius:var(--border-radius-medium);padding:12px;font-size:15px;transition:var(--transition);border:2px solid transparent;} 
+        select:focus{border-color:var(--ios-blue);outline:none;} 
+        .action-row{display:flex;gap:16px;margin:24px 0;flex-wrap:wrap} 
+        .btn{padding:12px 20px;border-radius:var(--border-radius-medium);border:none;cursor:pointer;font-weight:600;font-size:15px;transition:var(--transition);box-shadow:var(--shadow-light);} 
+        .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-medium);} 
+        .btn-primary{background:linear-gradient(135deg, var(--ios-blue) 0%, #5856D6 100%);color:#fff;} 
+        .btn-outline{background:var(--ios-white);border:2px solid var(--ios-gray-4);color:#000;} 
+        .btn-outline:hover{border-color:var(--ios-blue);color:var(--ios-blue);} 
+        .result-container{background:linear-gradient(135deg, var(--ios-gray-6) 0%, var(--ios-white) 100%);padding:20px;border-radius:var(--border-radius-large);margin-top:20px;border:1px solid var(--ios-gray-4);} 
+        .result-label{font-size:16px;font-weight:600;margin-bottom:12px;color:#1D1D1F;display:flex;justify-content:space-between;align-items:center;} 
+        .result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:10px} 
+        .result-card{background:var(--ios-white);padding:16px;border-radius:var(--border-radius-medium);display:flex;flex-direction:column;gap:8px;border:1px solid var(--ios-gray-4);box-shadow:var(--shadow-light);} 
+        .result-card .result-label{font-size:14px;color:var(--ios-gray-1);display:flex;justify-content:space-between;align-items:center} 
+        .result-value{background:var(--ios-gray-6);padding:12px;border-radius:8px;font-family:Monaco,monospace;word-break:break-all;border-left:4px solid var(--ios-blue);min-height:44px;display:flex;align-items:center;} 
+        .small-btn{padding:8px 12px;border-radius:var(--border-radius-medium);border:none;background:linear-gradient(135deg, var(--ios-blue) 0%, #5856D6 100%);color:#fff;cursor:pointer;font-weight:600;font-size:14px;transition:var(--transition);} 
+        .small-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-medium);} 
+        .copy-notification{position:fixed;top:24px;right:24px;background:linear-gradient(135deg, var(--ios-green) 0%, #30D158 100%);color:#fff;padding:12px 20px;border-radius:var(--border-radius-large);box-shadow:var(--shadow-heavy);opacity:0;transform:translateY(-10px);transition:var(--transition);font-weight:500;} 
+        .copy-notification.show{opacity:1;transform:translateY(0)} 
+        footer{margin-top:32px;color:var(--ios-gray-1);font-size:13px;text-align:center;padding:16px;border-radius:var(--border-radius-medium);background:var(--ios-gray-6);} 
+        @media (max-width:768px){
+            .sidebar{transform:translateX(-100%);position:fixed;z-index:1000;transition:var(--transition);}
+            .main-content{margin-left:0;padding:20px}
+            .tool-panel{max-width:100%;}
+            .panel-title h1{font-size:24px;}
+            .action-row{flex-direction:column;}
+            .btn{width:100%;}
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">前端工具集</div>
+            <div class="sidebar-subtitle">Web 开发工具</div>
+        </div>
+        <nav class="sidebar-nav">
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <a href="index.html" class="menu-link">
+                        <span class="menu-icon">🏠</span>
+                        <span class="menu-text">首页</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="json-parser.html" class="menu-link">
+                        <span class="menu-icon">📄</span>
+                        <span class="menu-text">JSON 解析</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a href="camel-case-converter.html" class="menu-link">
+                        <span class="menu-icon">🔄</span>
+                        <span class="menu-text">命名转换</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="time-calculator.html" class="menu-link">
+                        <span class="menu-icon">⏰</span>
+                        <span class="menu-text">时间计算</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="random-data-generator.html" class="menu-link">
+                        <span class="menu-icon">🎲</span>
+                        <span class="menu-text">随机数据</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="tool-panel" role="region" aria-label="驼峰名转换">
+            <div class="panel-title">
+                <div>
+                    <h1>驼峰名转换</h1>
+                    <div class="panel-subtitle">字符串命名格式转换</div>
+                </div>
+                <a href="index.html" class="btn btn-outline">返回首页</a>
+            </div>
+
+            <div class="input-container">
+                <label class="input-label" for="inputText">输入字符串：</label>
+                <input type="text" id="inputText" placeholder="例如：hello_world 或 helloWorld" />
+            </div>
+
+            <div class="action-row">
+                <button id="convertBtn" class="btn btn-primary">转换</button>
+                <button id="clearBtn" class="btn btn-outline">清空</button>
+            </div>
+
+            <div class="result-container">
+                <div class="result-label">转换结果：</div>
+                <div id="resultGrid" class="result-grid">
+                    <div class="result-card">
+                        <div class="result-label" style="display:flex;justify-content:space-between;align-items:center;">
+                            <span>驼峰命名 (camelCase)</span>
+                            <button class="copy-btn small-btn" data-target="camelResult">复制</button>
+                        </div>
+                        <div id="camelResult" class="result-value">-</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label" style="display:flex;justify-content:space-between;align-items:center;">
+                            <span>帕斯卡命名 (PascalCase)</span>
+                            <button class="copy-btn small-btn" data-target="pascalResult">复制</button>
+                        </div>
+                        <div id="pascalResult" class="result-value">-</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label" style="display:flex;justify-content:space-between;align-items:center;">
+                            <span>下划线命名 (snake_case)</span>
+                            <button class="copy-btn small-btn" data-target="snakeResult">复制</button>
+                        </div>
+                        <div id="snakeResult" class="result-value">-</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label" style="display:flex;justify-content:space-between;align-items:center;">
+                            <span>横线命名 (kebab-case)</span>
+                            <button class="copy-btn small-btn" data-target="kebabResult">复制</button>
+                        </div>
+                        <div id="kebabResult" class="result-value">-</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label" style="display:flex;justify-content:space-between;align-items:center;">
+                            <span>空格分隔</span>
+                            <button class="copy-btn small-btn" data-target="spaceResult">复制</button>
+                        </div>
+                        <div id="spaceResult" class="result-value">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <footer>
+                <small>支持多种命名格式互转</small>
+            </footer>
+        </div>
+    </main>
+
+    <div id="copyNotification" class="copy-notification" aria-live="polite">已复制到剪贴板</div>
+
+    <script>
+        const inputText = document.getElementById('inputText');
+        const convertBtn = document.getElementById('convertBtn');
+        const clearBtn = document.getElementById('clearBtn');
+
+        function showCopyNotification(text){
+            const el = document.getElementById('copyNotification');
+            el.textContent = text || '已复制到剪贴板';
+            el.classList.add('show');
+            setTimeout(()=>el.classList.remove('show'),1800);
+        }
+
+        function copyToClipboard(text){
+            if(!text || text === '-') return;
+            if(navigator.clipboard && window.isSecureContext){
+                navigator.clipboard.writeText(text).then(()=>showCopyNotification()).catch(()=>fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+        function fallbackCopy(text){
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try{
+                document.execCommand('copy');
+                showCopyNotification();
+            }catch(e){
+                console.error('复制失败', e);
+                alert('复制失败，请手动复制');
+            }
+            document.body.removeChild(ta);
+        }
+
+        function toWords(str) {
+            // Try to detect format and split into words
+            if (str.includes('_')) {
+                return str.split('_');
+            } else if (str.includes('-')) {
+                return str.split('-');
+            } else if (str.includes(' ')) {
+                return str.split(/\s+/);
+            } else {
+                // Camel or Pascal case
+                return str.replace(/([A-Z])/g, ' $1').trim().split(/\s+/);
+            }
+        }
+
+        function fromWords(words, format) {
+            switch(format) {
+                case 'camel':
+                    return words.map((word, index) => index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join('');
+                case 'pascal':
+                    return words.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join('');
+                case 'snake':
+                    return words.map(word => word.toLowerCase()).join('_');
+                case 'kebab':
+                    return words.map(word => word.toLowerCase()).join('-');
+                case 'space':
+                    return words.map(word => word.toLowerCase()).join(' ');
+                default:
+                    return words.join('');
+            }
+        }
+
+        function convertAll() {
+            const input = inputText.value.trim();
+            if (!input) {
+                document.getElementById('camelResult').textContent = '-';
+                document.getElementById('pascalResult').textContent = '-';
+                document.getElementById('snakeResult').textContent = '-';
+                document.getElementById('kebabResult').textContent = '-';
+                document.getElementById('spaceResult').textContent = '-';
+                return;
+            }
+            const words = toWords(input);
+            document.getElementById('camelResult').textContent = fromWords(words, 'camel');
+            document.getElementById('pascalResult').textContent = fromWords(words, 'pascal');
+            document.getElementById('snakeResult').textContent = fromWords(words, 'snake');
+            document.getElementById('kebabResult').textContent = fromWords(words, 'kebab');
+            document.getElementById('spaceResult').textContent = fromWords(words, 'space');
+        }
+
+        function clearAll() {
+            inputText.value = '';
+            convertAll();
+        }
+
+        convertBtn.addEventListener('click', convertAll);
+        clearBtn.addEventListener('click', clearAll);
+
+        // Auto convert
+        inputText.addEventListener('input', convertAll);
+
+        // Add copy event listeners
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.dataset.target;
+                const targetEl = document.getElementById(targetId);
+                copyToClipboard(targetEl.textContent);
+            });
+        });
+    </script>
+</body>
+</html>
