@@ -51,13 +51,13 @@
         .panel-subtitle{font-size:15px;color:var(--ios-gray-1);margin-top:4px;} 
         .input-container{display:flex;flex-direction:column;gap:8px;margin-bottom:20px} 
         .input-label{font-size:16px;font-weight:600;color:#1D1D1F;} 
-        input[type="date"], input[type="number"]{background:var(--ios-gray-6);border:1px solid var(--ios-gray-4);border-radius:var(--border-radius-medium);padding:16px;font-size:16px;transition:var(--transition);border:2px solid transparent;} 
-        input[type="date"]:focus, input[type="number"]:focus{border-color:var(--ios-blue);outline:none;} 
-        .select-container{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap} 
-        .select-group{display:flex;flex-direction:column;gap:6px} 
-        .select-label{font-size:16px;font-weight:600;color:#1D1D1F;} 
-        select{background:var(--ios-gray-6);border:1px solid var(--ios-gray-4);border-radius:var(--border-radius-medium);padding:12px;font-size:15px;transition:var(--transition);border:2px solid transparent;} 
-        select:focus{border-color:var(--ios-blue);outline:none;} 
+        input[type="date"], input[type="datetime-local"], input[type="number"]{background:var(--ios-gray-6);border:1px solid var(--ios-gray-4);border-radius:var(--border-radius-medium);padding:16px;font-size:16px;transition:var(--transition);border:2px solid transparent;max-width:280px;} 
+        input[type="date"]:focus, input[type="datetime-local"]:focus, input[type="number"]:focus{border-color:var(--ios-blue);outline:none;} 
+        .time-inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;margin-bottom:20px} 
+        .input-row{display:flex;flex-direction:column;gap:6px} 
+        .input-row .input-label{font-size:14px;font-weight:600;color:#1D1D1F;} 
+        .input-row input{background:var(--ios-gray-6);border:1px solid var(--ios-gray-4);border-radius:var(--border-radius-medium);padding:12px;font-size:14px;transition:var(--transition);border:2px solid transparent;width:100%;} 
+        .input-row input:focus{border-color:var(--ios-blue);outline:none;} 
         .action-row{display:flex;gap:16px;margin:24px 0;flex-wrap:wrap} 
         .btn{padding:12px 20px;border-radius:var(--border-radius-medium);border:none;cursor:pointer;font-weight:600;font-size:15px;transition:var(--transition);box-shadow:var(--shadow-light);} 
         .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-medium);} 
@@ -66,7 +66,9 @@
         .btn-outline:hover{border-color:var(--ios-blue);color:var(--ios-blue);} 
         .result-container{background:linear-gradient(135deg, var(--ios-gray-6) 0%, var(--ios-white) 100%);padding:20px;border-radius:var(--border-radius-large);margin-top:20px;border:1px solid var(--ios-gray-4);} 
         .result-label{font-size:16px;font-weight:600;margin-bottom:12px;color:#1D1D1F;} 
-        .result-text{background:var(--ios-white);padding:16px;border-radius:var(--border-radius-medium);font-family:Monaco,monospace;font-size:16px;word-break:break-all;border:1px solid var(--ios-gray-4);box-shadow:inset 0 1px 3px rgba(0,0,0,0.05);} 
+        .result-card{background:var(--ios-white);padding:20px;border-radius:var(--border-radius-medium);display:flex;align-items:center;gap:16px;border:1px solid var(--ios-gray-4);box-shadow:inset 0 1px 3px rgba(0,0,0,0.05);} 
+        .result-icon{font-size:24px;} 
+        .result-text{background:var(--ios-white);font-family:Monaco,monospace;font-size:16px;word-break:break-all;flex:1;} 
         .tab-container{display:flex;margin-bottom:20px;border-bottom:2px solid var(--ios-gray-4);border-radius:var(--border-radius-medium) var(--border-radius-medium) 0 0;overflow:hidden;} 
         .tab-btn{padding:12px 20px;border:none;background:var(--ios-gray-5);cursor:pointer;font-size:15px;font-weight:500;transition:var(--transition);border-right:1px solid var(--ios-gray-4);} 
         .tab-btn:last-child{border-right:none;} 
@@ -172,22 +174,24 @@
                             <option value="subtract">减</option>
                         </select>
                     </div>
-                    <div class="select-group">
-                        <label class="select-label" for="unit">单位：</label>
-                        <select id="unit">
-                            <option value="seconds">秒</option>
-                            <option value="minutes">分钟</option>
-                            <option value="hours">小时</option>
-                            <option value="days">天</option>
-                            <option value="weeks">周</option>
-                            <option value="months">月</option>
-                            <option value="years">年</option>
-                        </select>
-                    </div>
                 </div>
-                <div class="input-container">
-                    <label class="input-label" for="amount">数量：</label>
-                    <input type="number" id="amount" min="1" value="1" />
+                <div class="time-inputs">
+                    <div class="input-row">
+                        <label class="input-label" for="days">天：</label>
+                        <input type="number" id="days" min="0" value="0" />
+                    </div>
+                    <div class="input-row">
+                        <label class="input-label" for="hours">小时：</label>
+                        <input type="number" id="hours" min="0" value="0" />
+                    </div>
+                    <div class="input-row">
+                        <label class="input-label" for="minutes">分钟：</label>
+                        <input type="number" id="minutes" min="0" value="0" />
+                    </div>
+                    <div class="input-row">
+                        <label class="input-label" for="seconds">秒：</label>
+                        <input type="number" id="seconds" min="0" value="0" />
+                    </div>
                 </div>
                 <div class="action-row">
                     <button id="calcAddBtn" class="btn btn-primary">计算结果</button>
@@ -196,7 +200,10 @@
 
             <div class="result-container">
                 <div class="result-label">计算结果：</div>
-                <div id="resultText" class="result-text">-</div>
+                <div class="result-card">
+                    <div class="result-icon">⏱️</div>
+                    <div id="resultText" class="result-text">-</div>
+                </div>
             </div>
 
             <footer>
@@ -257,8 +264,10 @@
         // Date addition/subtraction
         const baseDate = document.getElementById('baseDate');
         const operation = document.getElementById('operation');
-        const unit = document.getElementById('unit');
-        const amount = document.getElementById('amount');
+        const daysInput = document.getElementById('days');
+        const hoursInput = document.getElementById('hours');
+        const minutesInput = document.getElementById('minutes');
+        const secondsInput = document.getElementById('seconds');
         const calcAddBtn = document.getElementById('calcAddBtn');
 
         function calcDateAdd() {
@@ -267,34 +276,15 @@
                 resultText.textContent = '请选择基准时间';
                 return;
             }
-            const amt = parseInt(amount.value) || 1;
+            const days = parseInt(daysInput.value) || 0;
+            const hours = parseInt(hoursInput.value) || 0;
+            const minutes = parseInt(minutesInput.value) || 0;
+            const seconds = parseInt(secondsInput.value) || 0;
+            
+            const totalMs = (days * 24 * 60 * 60 * 1000) + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
             const op = operation.value === 'add' ? 1 : -1;
-            let resultDate = new Date(base);
-
-            switch(unit.value) {
-                case 'seconds':
-                    resultDate.setSeconds(resultDate.getSeconds() + amt * op);
-                    break;
-                case 'minutes':
-                    resultDate.setMinutes(resultDate.getMinutes() + amt * op);
-                    break;
-                case 'hours':
-                    resultDate.setHours(resultDate.getHours() + amt * op);
-                    break;
-                case 'days':
-                    resultDate.setDate(resultDate.getDate() + amt * op);
-                    break;
-                case 'weeks':
-                    resultDate.setDate(resultDate.getDate() + amt * 7 * op);
-                    break;
-                case 'months':
-                    resultDate.setMonth(resultDate.getMonth() + amt * op);
-                    break;
-                case 'years':
-                    resultDate.setFullYear(resultDate.getFullYear() + amt * op);
-                    break;
-            }
-
+            
+            const resultDate = new Date(base.getTime() + totalMs * op);
             resultText.textContent = resultDate.toLocaleString('zh-CN');
         }
 
